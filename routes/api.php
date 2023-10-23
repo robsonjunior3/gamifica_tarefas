@@ -28,3 +28,13 @@ Route::resource('usuarios', UserController::class);
 Route::put('associar-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'associarseTarefa']);
 Route::put('concluir-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'concluirTarefa']);
 Route::get('ranking', [RankingController::class, 'getTarefas']);
+
+Route::post('/login', function(Request $request) {
+    if(Auth::attempt(['apelido'=> $request->apelido,'password'=> $request->password])) {
+        $user = Auth::user();
+        $token = $user->createToken('jwt_gamifica_tarefas');
+        return response()->json($token->plainTextToken, 200);
+    }
+    return response()->json('Usuário invalido', 200);
+});
+

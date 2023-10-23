@@ -25,13 +25,13 @@ class UserController extends Controller
         $request->validate([
             'nome' => 'required|string',
             'apelido' => 'required|string|unique:usuarios',
-            'senha' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $usuario = new User([
+        $usuario = new User([ 
             'nome' => $request->input('nome'),
             'apelido' => $request->input('apelido'),
-            'senha' => Hash::make($request->input('senha')),
+            'password' => Hash::make($request->input('password')),
         ]);
 
         $usuario->save();
@@ -54,7 +54,7 @@ class UserController extends Controller
         $request->validate([
             'nome' => 'required|string',
             'apelido' => 'required|string|unique:usuarios,apelido,' . $id,
-            'senha' => 'string',
+            'password' => 'string',
         ]);
         
         $usuario = User::find($id);
@@ -66,7 +66,7 @@ class UserController extends Controller
 
         $usuario->nome = $request->input('nome');
         $usuario->apelido = $request->input('apelido');
-        $usuario->senha = Hash::make($request->input('senha'));
+        $usuario->password = Hash::make($request->input('password'));
         $usuario->save();
         return UserResource::make($usuario);
     }
