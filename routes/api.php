@@ -25,12 +25,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // return $request->user();
 });
 
-Route::resource('tarefas', TarefaController::class);
-Route::resource('usuarios', UserController::class);
 
-Route::put('associar-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'associarseTarefa']);
-Route::put('concluir-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'concluirTarefa']);
-Route::get('ranking', [RankingController::class, 'getTarefas']);
 
 Route::post('login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::resource('tarefas', TarefaController::class);
+    Route::resource('usuarios', UserController::class);
+    
+    Route::put('associar-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'associarseTarefa']);
+    Route::put('concluir-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'concluirTarefa']);
+    Route::get('ranking', [RankingController::class, 'getTarefas']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});
