@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tarefa;
-use App\Http\Requests\StoretarefaRequest;
-use App\Http\Requests\UpdatetarefaRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\TarefasResource;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoretarefaRequest;
+use App\Http\Requests\UpdatetarefaRequest;
 
 class TarefaController extends Controller
 {
@@ -22,10 +23,30 @@ class TarefaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoretarefaRequest $request)
+    public function store(Request $request)
     {
-        $tarefa = Tarefa::create($request->validated());
-        return TarefasResource::make($tarefa);
+        $user = Auth::user();
+        if($user->nivel > 1){
+            $request->validate([
+                'nome' => 'required|string|max:255',
+                'descricao' => 'required|string',
+                'pontuacao' => 'required|integer',
+                'criador_id' => 'exists:usuarios,id',
+                'responsavel_id' => 'nullable|exists:usuarios,id',
+                'concluida' => 'boolean',
+            ]);
+
+            $tarefa = new Tarefa([ 
+                'nome' => $request->input('nome'),
+                'descricao' => $request->input('descricao'),
+                'pontuacao' => $request->input('pontuacao'),
+                'criador_id' => $user->id,
+            ]);
+
+            $tarefa->save();
+            return TarefasResource::make($tarefa);
+        }
+        return response()->json('O usuário autenticado não tem permissão para cadastrar uma nova tarefa.', 401);
     }
 
     /**
@@ -41,8 +62,13 @@ class TarefaController extends Controller
      */
     public function update(UpdatetarefaRequest $request, tarefa $tarefa)
     {
-        $tarefa->update($request->validated());
-        return TarefasResource::make($tarefa);
+        // user deve ser adm ou ser o criador da tarefa
+        $user = Auth::user();
+        if($user->nivel == 3 || $user->id == $tarefa->criador_id){
+            $tarefa->update($request->validated());
+            return TarefasResource::make($tarefa);
+        }
+        return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 401);
     }
 
     /**
@@ -50,7 +76,11 @@ class TarefaController extends Controller
      */
     public function destroy(tarefa $tarefa)
     {
-        $tarefa->delete();
-        return response()->noContent();
+        $user = Auth::user();
+        if($user->nivel == 3 || $user->id == $tarefa->criador_id){
+            $tarefa->delete();
+            return response()->json('Tarefa removida com sucesso', 200);
+        }
+        return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 401);
     }
 }
