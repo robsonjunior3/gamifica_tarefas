@@ -44,6 +44,6 @@ class GestaoTarefasController extends Controller
 
             return response()->json([UserResource::make($usuario), TarefasResource::make($tarefa)], 201);
         }
-        return response()->json('O usuário não pode concluir a tarefa informada.', 404);
+        return response()->json('O usuário não pode concluir a tarefa informada.', 401);
     }
 }

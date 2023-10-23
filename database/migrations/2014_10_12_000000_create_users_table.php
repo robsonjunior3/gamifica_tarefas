@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nome');
             $table->string('apelido')->unique();
             $table->string('senha');
+            $table->integer('nivel');
             $table->integer('pontuacao')->default(0);
             $table->rememberToken();
             $table->timestamps();

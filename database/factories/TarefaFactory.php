@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class TarefaFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nome' => fake()->name(),
+            'descricao' => fake()->text(),
+            'pontuacao' => rand(5,50),
+            'criador_id' => User::all()->random()->id,
         ];
     }
 }
