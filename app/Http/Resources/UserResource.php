@@ -18,8 +18,9 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'nome' => $this->nome,
             'apelido' => $this->apelido,
-            'senha' => $this->senha,
-            'pontuacao' => $this->pontuacao
+            'password' => $this->password,
+            'pontuacao' => $this->pontuacao,
+            'nivel' => $this->nivel
         ];
     }
 }

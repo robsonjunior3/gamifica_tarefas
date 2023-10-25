@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -22,20 +23,27 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nome' => 'required|string',
-            'apelido' => 'required|string|unique:usuarios',
-            'password' => 'required|string',
-        ]);
+        $user = Auth::user();
+        if($user->nivel > $request->nivel || $user->nivel == 3) 
+        {
+            $request->validate([
+                'nome' => 'required|string',
+                'apelido' => 'required|string|unique:usuarios',
+                'password' => 'required|string',
+                'nivel' => 'required', //usuarios de nivel 2 nao podem criar usuarios de nivel 3
+            ]);
 
-        $usuario = new User([ 
-            'nome' => $request->input('nome'),
-            'apelido' => $request->input('apelido'),
-            'password' => Hash::make($request->input('password')),
-        ]);
+            $usuario = new User([ 
+                'nome' => $request->input('nome'),
+                'apelido' => $request->input('apelido'),
+                'password' => $request->input('password'),
+                'nivel' => $request->input('nivel'),
+            ]);
 
-        $usuario->save();
-        return UserResource::make($usuario);
+            $usuario->save();
+            return UserResource::make($usuario);
+        }
+        return response()->json('O usuário autenticado não tem permissão para criar o usuario informado.', 401);
     }
 
     /**
@@ -51,24 +59,28 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nome' => 'required|string',
-            'apelido' => 'required|string|unique:usuarios,apelido,' . $id,
-            'password' => 'string',
-        ]);
-        
+        $user = Auth::user();
         $usuario = User::find($id);
-
-        if(!$usuario){
+        
+        if(!$usuario)
             return response()->json('Usuário não encontrado.', 404);
-            // return redirect('/usuarios')->with('error', 'Usuário não encontrado.');
-        }
 
-        $usuario->nome = $request->input('nome');
-        $usuario->apelido = $request->input('apelido');
-        $usuario->password = Hash::make($request->input('password'));
-        $usuario->save();
-        return UserResource::make($usuario);
+        if(($user->nivel > $usuario->nivel && $user->nivel > $request->nivel) || $user->nivel == 3) 
+        {
+            $request->validate([
+                'nome' => 'string',
+                'apelido' => 'string|unique:usuarios,apelido,' . $id,
+                'password' => 'string',
+            ]);    
+    
+            $usuario->nome = $request->input('nome');
+            $usuario->apelido = $request->input('apelido');
+            $usuario->password = $request->input('password');
+            $usuario->nivel = $request->input('nivel');
+            $usuario->save();
+            return UserResource::make($usuario);
+        }
+        return response()->json('O usuário autenticado não tem permissão para editar o usuario informado.', 401);
     }
 
     /**
@@ -76,7 +88,12 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        User::find($id)->delete();
-        return response()->noContent();
+        $user = Auth::user();
+        $usuario = User::find($id);
+        
+        if($user->nivel > $usuario->nivel || $user->nivel == 3) 
+            User::find($id)->delete();
+        
+        return response()->json('Usuário removido com sucesso.');
     }
 }
