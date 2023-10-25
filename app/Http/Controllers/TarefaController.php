@@ -60,12 +60,28 @@ class TarefaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatetarefaRequest $request, tarefa $tarefa)
+    public function update(Request $request, Tarefa $tarefa)
     {
         // user deve ser adm ou ser o criador da tarefa
         $user = Auth::user();
         if($user->nivel == 3 || $user->id == $tarefa->criador_id){
-            $tarefa->update($request->validated());
+            $request->validate([
+                'nome' => 'string|max:255',
+                'descricao' => 'string',
+                'pontuacao' => 'integer',
+                'criador_id' => 'exists:usuarios,id',
+                'responsavel_id' => 'nullable|exists:usuarios,id',
+                'concluida' => 'boolean',
+            ]);
+            $tarefa->nome = $request->input('nome') ? $request->input('nome') : $tarefa->nome;
+            $tarefa->descricao = $request->input('descricao') ? $request->input('descricao') : $tarefa->descricao;
+            $tarefa->pontuacao = $request->input('pontuacao') ? $request->input('pontuacao') : $tarefa->pontuacao;
+            $tarefa->criador_id = $request->input('criador_id') ? $request->input('criador_id') : $tarefa->criador_id;
+            $tarefa->responsavel_id = $request->input('responsavel_id') ? $request->input('responsavel_id') : $tarefa->responsavel_id;
+            $tarefa->concluida = $request->input('concluida') ? $request->input('concluida') : $tarefa->concluida;
+            
+            $tarefa->save();
+
             return TarefasResource::make($tarefa);
         }
         return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 401);

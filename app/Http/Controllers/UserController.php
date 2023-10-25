@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -30,7 +30,7 @@ class UserController extends Controller
                 'nome' => 'required|string',
                 'apelido' => 'required|string|unique:usuarios',
                 'password' => 'required|string',
-                'nivel' => 'required', //usuarios de nivel 2 nao podem criar usuarios de nivel 3
+                'nivel' => 'required',
             ]);
 
             $usuario = new User([ 
@@ -72,12 +72,14 @@ class UserController extends Controller
                 'apelido' => 'string|unique:usuarios,apelido,' . $id,
                 'password' => 'string',
             ]);    
-    
-            $usuario->nome = $request->input('nome');
-            $usuario->apelido = $request->input('apelido');
-            $usuario->password = $request->input('password');
-            $usuario->nivel = $request->input('nivel');
+            
+            $usuario->nome = $request->input('nome') ? $request->input('nome') : $usuario->nome;
+            $usuario->apelido = $request->input('apelido') ? $request->input('apelido') : $usuario->apelido;
+            $usuario->password = $request->input('password') ? $request->input('password') : $usuario->password;
+            $usuario->nivel = $request->input('nivel') ? $request->input('nivel') : $usuario->nivel;
+
             $usuario->save();
+
             return UserResource::make($usuario);
         }
         return response()->json('O usuário autenticado não tem permissão para editar o usuario informado.', 401);
