@@ -15,7 +15,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::all());;
+        $user = Auth::user();
+        if($user->nivel > 1)
+            return UserResource::collection(User::all());
+        else 
+            return response()->json('O usuário logado não tem permissão para verificar a lista de usuário', 401);
     }
 
     /**
@@ -24,7 +28,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if($user->nivel > $request->nivel || $user->nivel == 3) 
+        if(($request->nivel > 0 && $request->nivel < 4) && ($user->nivel > $request->nivel || $user->nivel == 3)) 
         {
             $request->validate([
                 'nome' => 'required|string',
@@ -51,7 +55,11 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return UserResource::make(User::find($id));
+        $user = Auth::user();
+        if($user->nivel > 1)
+            return UserResource::make(User::find($id));
+        else 
+            return response()->json('O usuário logado não tem permissão para verificar a lista de usuário', 401);
     }
 
     /**
@@ -93,9 +101,12 @@ class UserController extends Controller
         $user = Auth::user();
         $usuario = User::find($id);
         
-        if($user->nivel > $usuario->nivel || $user->nivel == 3) 
+        if($usuario && ($user->nivel > $usuario->nivel || $user->nivel == 3)) 
+        {
             User::find($id)->delete();
+            return response()->json('Usuário removido com sucesso.', 200);
+        }
         
-        return response()->json('Usuário removido com sucesso.');
+        return response()->json('Não foi possível remover o usuário informado.', 401);
     }
 }
