@@ -21,8 +21,8 @@ return new class extends Migration
             $table->boolean('concluida')->default(false);
             $table->timestamps();
 
-            $table->foreign('criador_id')->references('id')->on('usuarios');
-            $table->foreign('responsavel_id')->references('id')->on('usuarios');
+            $table->foreign('criador_id')->references('id')->on('usuarios')->cascadeOnDelete();//->onDelete('cascade');;
+            $table->foreign('responsavel_id')->references('id')->on('usuarios')->nullOnDelete();//->onDelete('set null');
         });
     }
 
