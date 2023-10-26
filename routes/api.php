@@ -33,8 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('tarefas', TarefaController::class);
     Route::resource('usuarios', UserController::class);
     
-    Route::put('associar-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'associarseTarefa']);
-    Route::put('concluir-tarefa/{user_id}/{tarefa_id}', [GestaoTarefasController::class, 'concluirTarefa']);
+    Route::put('associar-tarefa/{tarefa_id}', [GestaoTarefasController::class, 'associarseTarefa']);
+    Route::put('concluir-tarefa/{tarefa_id}', [GestaoTarefasController::class, 'concluirTarefa']);
+    
     Route::get('ranking', [RankingController::class, 'getTarefas']);
     Route::post('logout', [AuthController::class, 'logout']);
 });

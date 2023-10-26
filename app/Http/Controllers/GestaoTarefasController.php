@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Tarefa;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\TarefasResource;
 
 class GestaoTarefasController extends Controller
@@ -13,24 +14,33 @@ class GestaoTarefasController extends Controller
     /**
      * Associa um usuario a uma tarefa 
      */
-    public function associarseTarefa(int $user_id, int $tarefa_id)
+    public function associarseTarefa(int $tarefa_id)
     {
-        $usuario = User::find($user_id);
+        // $usuario = User::find($user_id);
+        $usuario = Auth::user();
         $tarefa = Tarefa::find($tarefa_id);
 
-        $tarefa->responsavel_id = $usuario->id;
-
-        $tarefa->save();
-
-        return TarefasResource::make($tarefa);
+        if($tarefa)
+        {
+            if($tarefa->responsavel_id == null && !$tarefa->concluida)
+            {
+                $tarefa->responsavel_id = $usuario->id;
+        
+                $tarefa->save();
+        
+                return TarefasResource::make($tarefa);
+            }
+        }
+        return response()->json('O usuário não pode se vincular à tarefa informada', 401);
     }
 
     /**
      * Marca uma tarefa como concluida e atualiza os pontos do usuario
      */
-    public function concluirTarefa(int $user_id, int $tarefa_id)
+    public function concluirTarefa(int $tarefa_id)
     {
-        $usuario = User::find($user_id);
+        // $usuario = User::find($user_id);
+        $usuario = Auth::user();
         $tarefa = Tarefa::find($tarefa_id);
 
         if($usuario->id == $tarefa->responsavel_id && !$tarefa->concluida)
@@ -46,4 +56,6 @@ class GestaoTarefasController extends Controller
         }
         return response()->json('O usuário não pode concluir a tarefa informada.', 401);
     }
+
+    public function dessassciarTarefa(){}
 }
