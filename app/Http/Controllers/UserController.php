@@ -28,7 +28,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if(($request->nivel > 0 && $request->nivel < 4) && ($user->nivel > $request->nivel || $user->nivel == 3)) 
+        if (($request->nivel >= 1 && $request->nivel <= 3) && (($user->nivel > $request->nivel) || $user->nivel == 3)) 
         {
             $request->validate([
                 'nome' => 'required|string',
@@ -47,7 +47,7 @@ class UserController extends Controller
             $usuario->save();
             return UserResource::make($usuario);
         }
-        return response()->json('O usuário autenticado não tem permissão para criar o usuario informado.', 401);
+        return response()->json('O usuário autenticado não tem permissão para criar o usuario informado.', 403);
     }
 
     /**
@@ -73,7 +73,8 @@ class UserController extends Controller
         if(!$usuario)
             return response()->json('Usuário não encontrado.', 404);
 
-        if(($user->nivel > $usuario->nivel && $user->nivel > $request->nivel) || $user->nivel == 3) 
+        if(($request->nivel >= 1 && $request->nivel <= 3) && 
+            (($user->nivel > $usuario->nivel && $user->nivel > $request->nivel) || $user->nivel == 3))
         {
             $request->validate([
                 'nome' => 'string',
@@ -90,7 +91,7 @@ class UserController extends Controller
 
             return UserResource::make($usuario);
         }
-        return response()->json('O usuário autenticado não tem permissão para editar o usuario informado.', 401);
+        return response()->json('O usuário autenticado não tem permissão para editar o usuario informado.', 403);
     }
 
     /**
@@ -101,12 +102,16 @@ class UserController extends Controller
         $user = Auth::user();
         $usuario = User::find($id);
         
-        if($usuario && ($user->nivel > $usuario->nivel || $user->nivel == 3)) 
+        if($usuario)
         {
-            User::find($id)->delete();
-            return response()->json('Usuário removido com sucesso.', 200);
+            if($user->nivel > $usuario->nivel || $user->nivel == 3)
+            {
+                User::find($id)->delete();
+                return response()->json('Usuário removido com sucesso.', 200);
+            }
+            return response()->json('Não foi possível remover o usuário informado.', 403);
         }
+        return response()->json('Não foi possível remover o usuário informado.', 404);
         
-        return response()->json('Não foi possível remover o usuário informado.', 401);
     }
 }
