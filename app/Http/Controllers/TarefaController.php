@@ -46,7 +46,7 @@ class TarefaController extends Controller
             $tarefa->save();
             return TarefasResource::make($tarefa);
         }
-        return response()->json('O usuário autenticado não tem permissão para cadastrar uma nova tarefa.', 401);
+        return response()->json('O usuário autenticado não tem permissão para cadastrar uma nova tarefa.', 403);
     }
 
     /**
@@ -84,7 +84,7 @@ class TarefaController extends Controller
 
             return TarefasResource::make($tarefa);
         }
-        return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 401);
+        return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 403);
     }
 
     /**
@@ -97,6 +97,6 @@ class TarefaController extends Controller
             $tarefa->delete();
             return response()->json('Tarefa removida com sucesso', 200);
         }
-        return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 401);
+        return response()->json('O usuário autenticado não tem permissão para alterar a tarefa.', 403);
     }
 }
