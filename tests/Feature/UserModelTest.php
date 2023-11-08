@@ -21,8 +21,6 @@ class UserModelTest extends TestCase
             'nivel' => 3
         ]);
 
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
-
         $response = $this->actingAs($user)->get('/api/usuarios');
         $response->assertStatus(200);
     }
@@ -35,8 +33,6 @@ class UserModelTest extends TestCase
             'password' => 'password',
             'nivel' => 3
         ]);
-
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $usuario = User::first();
         $response = $this->actingAs($user)->get('/api/usuarios/' . $usuario->id);
@@ -53,8 +49,6 @@ class UserModelTest extends TestCase
         ]);
         
         $this->actingAs($user);
-
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',
@@ -77,8 +71,6 @@ class UserModelTest extends TestCase
         
         $this->actingAs($user);
 
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
-
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',
             'apelido' => 'jose123',
@@ -99,8 +91,6 @@ class UserModelTest extends TestCase
         ]);
         
         $this->actingAs($user);
-
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',
@@ -123,8 +113,6 @@ class UserModelTest extends TestCase
         
         $this->actingAs($user);
 
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
-
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',
             'apelido' => 'jose123',
@@ -145,8 +133,6 @@ class UserModelTest extends TestCase
         ]);
         
         $this->actingAs($user);
-
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',
@@ -169,8 +155,6 @@ class UserModelTest extends TestCase
         
         $this->actingAs($user);
 
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
-
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',
             'apelido' => 'jose123',
@@ -191,8 +175,6 @@ class UserModelTest extends TestCase
         ]);
         
         $this->actingAs($user);
-
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $response = $this->post('/api/usuarios', [
             'nome' => 'José',

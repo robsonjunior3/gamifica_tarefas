@@ -20,8 +20,6 @@ class TarefaModelTest extends TestCase
             'password' => 'password',
             'nivel' => 3
         ]);
-        
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $response = $this->actingAs($user)->get('/api/tarefas');
         $response->assertStatus(200);
@@ -42,8 +40,6 @@ class TarefaModelTest extends TestCase
             'pontuacao' => 150,
             'criador_id' => 1
         ]);
-        
-        $this->assertNotNull($user, 'Usuário não encontrado no banco de dados');
 
         $response = $this->actingAs($user)->get('/api/tarefas/1');
         $response->assertStatus(200);
@@ -386,7 +382,7 @@ class TarefaModelTest extends TestCase
     }
 
     // user 3 remove a tarefa de outros usuarios
-    public function test_usuario_de_nivel_2_pode_remover_qualquer_tarefa(): void
+    public function test_usuario_de_nivel_3_pode_remover_qualquer_tarefa(): void
     {
         User::create([
             'nome' => 'José',
