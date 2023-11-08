@@ -18,7 +18,7 @@ class AuthController extends Controller
             $token = $user->createToken('jwt_gamifica_tarefas');
             return response()->json($token->plainTextToken, 200);
         }
-        return response()->json('Usuário invalido', 200);
+        return response()->json('Usuário invalido', 401);
     }
 
     /**
