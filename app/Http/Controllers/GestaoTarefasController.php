@@ -31,7 +31,7 @@ class GestaoTarefasController extends Controller
                 return TarefasResource::make($tarefa);
             }
         }
-        return response()->json('O usuário não pode se vincular à tarefa informada', 401);
+        return response()->json('O usuário não pode se vincular à tarefa informada', 403);
     }
 
     /**
@@ -52,10 +52,26 @@ class GestaoTarefasController extends Controller
             $usuario->save();
             $tarefa->save();
 
-            return response()->json([UserResource::make($usuario), TarefasResource::make($tarefa)], 201);
+            return response()->json([UserResource::make($usuario), TarefasResource::make($tarefa)], 200);
         }
-        return response()->json('O usuário não pode concluir a tarefa informada.', 401);
+        return response()->json('O usuário não pode concluir a tarefa informada.', 403);
     }
 
-    public function dessassciarTarefa(){}
+    public function desassociarTarefa(int $tarefa_id){
+        $usuario = Auth::user();
+        $tarefa = Tarefa::find($tarefa_id);
+
+        if(!$tarefa->concluida)
+        {
+            if($usuario->id == $tarefa->responsavel_id)
+            {
+                $tarefa->responsavel_id = NULL;
+    
+                $tarefa->save();
+                return response()->json(TarefasResource::make($tarefa), 201);
+            }
+            return response()->json('O usuário não pode se desasociar da tarefa informada.', 403);
+        }
+        return response()->json('A tarefa já foi concluída. O usuário não pode se desasociar da tarefa informada.', 403);
+    }
 }
